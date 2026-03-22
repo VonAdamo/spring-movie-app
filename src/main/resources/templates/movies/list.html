@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filmer</title>
 </head>
-<body>
+<body style="background-color:lightsteelblue">
     <h1>Filmregister</h1>
 
     <p>
-        <a href="@{/movies/create}">Skapa ny film</a>
+        <a th:href="@{/movies/create}">Skapa ny film</a>
     </p>
 
     <div th:if="${#lists.isEmpty(movies)}">

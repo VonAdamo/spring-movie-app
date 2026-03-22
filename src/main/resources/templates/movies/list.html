@@ -1,0 +1,47 @@
+﻿<!doctype html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmer</title>
+</head>
+<body>
+    <h1>Filmregister</h1>
+
+    <p>
+        <a href="@{/movies/create}">Skapa ny film</a>
+    </p>
+
+    <div th:if="${#lists.isEmpty(movies)}">
+        <p>Inga filmer ännu.</p>
+    </div>
+
+    <table th:if="${!#lists.isEmpty(movies)}" border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th>Regissör</th>
+                <th>Genre</th>
+                <th>Releasedatum</th>
+                <th>Längd (min)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="movie : ${movies}">
+                <td th:text="${movie.title}">Titel</td>
+                <td th:text="${movie.director}">Regissör</td>
+                <td th:text="${movie.genre}">Genre</td>
+                <td th:text="${movie.releaseDate}">Releasedatum</td>
+                <td th:text="${movie.durationMinutes}">Längd</td>
+                <td>
+                    <a th:href="@{/movies/{id}/edit(id=${movie.id})}">Edit</a>
+                    <form th:action="@{/movies/{id}/delete(id=${movie.id})}" method="post" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

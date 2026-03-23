@@ -43,11 +43,17 @@ public class Movie {
     @Size(max = 100)
     private String genre;
 
+    @Size(max = 300)
+    private String posterPath;
+
+    @Size(max = 300)
+    private String backdropPath;
+
     public Movie() {
     }
 
     public Movie(Long id, String title, String description, LocalDate releaseDate, String director,
-                 Integer durationMinutes, String genre) {
+                 Integer durationMinutes, String genre, String posterPath, String backdropPath) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -55,6 +61,8 @@ public class Movie {
         this.director = director;
         this.durationMinutes = durationMinutes;
         this.genre = genre;
+        this.posterPath = posterPath;
+        this.backdropPath = backdropPath;
     }
 
     public Long getId() {
@@ -111,5 +119,21 @@ public class Movie {
 
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
+    }
+
+    public String getBackdropPath() {
+        return backdropPath;
+    }
+
+    public void setBackdropPath(String backdropPath) {
+        this.backdropPath = backdropPath;
     }
 }

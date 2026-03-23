@@ -44,7 +44,9 @@ public class MovieMapper {
             movie.getReleaseDate(),
             movie.getDirector(),
             movie.getDurationMinutes(),
-            movie.getGenre()
+            movie.getGenre(),
+            movie.getPosterPath(),
+            movie.getBackdropPath()
         );
     }
 }

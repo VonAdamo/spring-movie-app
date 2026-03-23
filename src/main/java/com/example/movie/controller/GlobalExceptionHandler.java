@@ -14,12 +14,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public String handleNotFound(ResourceNotFoundException ex, Model model) {
         model.addAttribute("errorMessage", ex.getMessage());
-        return "error";
+        return "error/error";
     }
 
     @ExceptionHandler(DuplicateMovieException.class)
     public String handleDuplicate(DuplicateMovieException ex, Model model) {
         model.addAttribute("errorMessage", ex.getMessage());
-        return "error";
+        return "error/error";
     }
 }

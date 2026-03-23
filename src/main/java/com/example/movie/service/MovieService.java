@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.movie.dto.CreateMovieDTO;
 import com.example.movie.dto.MovieDTO;
@@ -30,6 +33,15 @@ public class MovieService {
             .stream()
             .map(MovieMapper::toDto)
             .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MovieDTO> getMovies(String title, String director, String genre, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return movieRepository
+            .findByTitleContainingIgnoreCaseAndDirectorContainingIgnoreCaseAndGenreContainingIgnoreCase(
+                normalizeToEmpty(title), normalizeToEmpty(director), normalizeToEmpty(genre), pageable)
+            .map(MovieMapper::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -66,5 +78,12 @@ public class MovieService {
             throw new ResourceNotFoundException("Movie", id);
         }
         movieRepository.deleteById(id);
+    }
+
+    private String normalizeToEmpty(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.trim();
     }
 }

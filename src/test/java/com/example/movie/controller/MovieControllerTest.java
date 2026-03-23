@@ -19,8 +19,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import com.example.movie.dto.MovieDTO;
+import com.example.movie.service.MovieImportService;
 import com.example.movie.service.MovieService;
 
 @WebMvcTest(MovieController.class)
@@ -32,6 +36,9 @@ class MovieControllerTest {
 
     @MockBean
     private MovieService movieService;
+
+    @MockBean
+    private MovieImportService movieImportService;
 
     @Test
     void contextLoads() {
@@ -47,7 +54,9 @@ class MovieControllerTest {
             LocalDate.of(2010, 7, 16),
             "Christopher Nolan",
             148,
-            "Sci-Fi"
+            "Sci-Fi",
+            null,
+            null
         );
         MovieDTO second = new MovieDTO(
             2L,
@@ -56,15 +65,49 @@ class MovieControllerTest {
             LocalDate.of(1999, 3, 31),
             "The Wachowskis",
             136,
-            "Sci-Fi"
+            "Sci-Fi",
+            null,
+            null
         );
 
-        when(movieService.getAllMovies()).thenReturn(List.of(first, second));
+        Page<MovieDTO> page = new PageImpl<>(List.of(first, second), PageRequest.of(0, 10), 2);
+        when(movieService.getMovies(null, null, null, 0, 10)).thenReturn(page);
 
         mockMvc.perform(get("/movies"))
             .andExpect(status().isOk())
             .andExpect(view().name("movies/list"))
             .andExpect(model().attributeExists("movies"));
+    }
+
+    @Test
+    void getMovies_withFilters_returnsListViewWithFilters() throws Exception {
+        MovieDTO filtered = new MovieDTO(
+            1L,
+            "Inception",
+            "A mind-bending thriller.",
+            LocalDate.of(2010, 7, 16),
+            "Christopher Nolan",
+            148,
+            "Sci-Fi",
+            null,
+            null
+        );
+
+        Page<MovieDTO> page = new PageImpl<>(List.of(filtered), PageRequest.of(0, 10), 1);
+        when(movieService.getMovies("inc", "nolan", "sci-fi", 0, 10)).thenReturn(page);
+
+        mockMvc.perform(get("/movies")
+                .param("title", "inc")
+                .param("director", "nolan")
+                .param("genre", "sci-fi")
+                .param("page", "0")
+                .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("movies/list"))
+            .andExpect(model().attributeExists("movies"))
+            .andExpect(model().attribute("title", "inc"))
+            .andExpect(model().attribute("director", "nolan"))
+            .andExpect(model().attribute("genre", "sci-fi"));
     }
 
     @Test
@@ -84,7 +127,9 @@ class MovieControllerTest {
             LocalDate.of(2010, 7, 16),
             "Christopher Nolan",
             148,
-            "Sci-Fi"
+            "Sci-Fi",
+            null,
+            null
         );
 
         when(movieService.createMovie(org.mockito.ArgumentMatchers.any()))
@@ -128,7 +173,9 @@ class MovieControllerTest {
             LocalDate.of(2010, 7, 16),
             "Christopher Nolan",
             148,
-            "Sci-Fi"
+            "Sci-Fi",
+            null,
+            null
         );
 
         when(movieService.getMovieById(1L)).thenReturn(existing);
@@ -148,7 +195,9 @@ class MovieControllerTest {
             LocalDate.of(2010, 7, 16),
             "Christopher Nolan",
             148,
-            "Sci-Fi"
+            "Sci-Fi",
+            null,
+            null
         );
 
         when(movieService.updateMovie(org.mockito.ArgumentMatchers.eq(1L),
@@ -204,7 +253,7 @@ class MovieControllerTest {
 
         mockMvc.perform(get("/movies/999/edit"))
             .andExpect(status().isOk())
-            .andExpect(view().name("error"))
+            .andExpect(view().name("error/error"))
             .andExpect(model().attributeExists("errorMessage"));
     }
 
@@ -224,7 +273,7 @@ class MovieControllerTest {
                 .param("durationMinutes", "148")
                 .param("genre", "Sci-Fi"))
             .andExpect(status().isOk())
-            .andExpect(view().name("error"))
+            .andExpect(view().name("error/error"))
             .andExpect(model().attributeExists("errorMessage"));
     }
 
@@ -235,7 +284,7 @@ class MovieControllerTest {
 
         mockMvc.perform(post("/movies/999/delete"))
             .andExpect(status().isOk())
-            .andExpect(view().name("error"))
+            .andExpect(view().name("error/error"))
             .andExpect(model().attributeExists("errorMessage"));
     }
 }

@@ -15,6 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.movie.dto.CreateMovieDTO;
 import com.example.movie.dto.MovieDTO;
@@ -79,15 +83,14 @@ class MovieServiceTest {
 
     @Test
     void createMovie_whenOk_returnsDto() {
-        Movie saved = new Movie(
-            2L,
-            createDto.getTitle(),
-            createDto.getDescription(),
-            createDto.getReleaseDate(),
-            createDto.getDirector(),
-            createDto.getDurationMinutes(),
-            createDto.getGenre()
-        );
+        Movie saved = new Movie();
+        saved.setId(2L);
+        saved.setTitle(createDto.getTitle());
+        saved.setDescription(createDto.getDescription());
+        saved.setReleaseDate(createDto.getReleaseDate());
+        saved.setDirector(createDto.getDirector());
+        saved.setDurationMinutes(createDto.getDurationMinutes());
+        saved.setGenre(createDto.getGenre());
 
         when(movieRepository.existsByTitleAndReleaseDate(
             createDto.getTitle(), createDto.getReleaseDate()
@@ -199,5 +202,29 @@ class MovieServiceTest {
         when(movieRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> movieService.deleteMovie(1L));
+    }
+
+    @Test
+    void getMovies_withFiltersAndPaging_returnsPageDto() {
+        Movie secondMovie = new Movie();
+        secondMovie.setId(2L);
+        secondMovie.setTitle("The Matrix");
+        secondMovie.setDescription("A hacker discovers reality.");
+        secondMovie.setReleaseDate(LocalDate.of(1999, 3, 31));
+        secondMovie.setDirector("The Wachowskis");
+        secondMovie.setDurationMinutes(136);
+        secondMovie.setGenre("Sci-Fi");
+
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Movie> page = new PageImpl<>(List.of(sampleMovie, secondMovie), pageable, 2);
+
+        when(movieRepository.findByTitleContainingIgnoreCaseAndDirectorContainingIgnoreCaseAndGenreContainingIgnoreCase(
+            "Inception", "", "Sci-Fi", pageable)).thenReturn(page);
+
+        Page<MovieDTO> result = movieService.getMovies("Inception", "", "Sci-Fi", 0, 2);
+
+        assertEquals(2, result.getTotalElements());
+        assertEquals("Inception", result.getContent().get(0).getTitle());
+        assertEquals("The Matrix", result.getContent().get(1).getTitle());
     }
 }

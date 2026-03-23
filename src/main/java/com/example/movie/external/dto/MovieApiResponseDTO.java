@@ -1,41 +1,29 @@
-package com.example.movie.dto;
+package com.example.movie.external.dto;
 
-import java.time.LocalDate;
+public class MovieApiResponseDTO {
 
-public class MovieDTO {
-
-    private Long id;
     private String title;
-    private String description;
-    private LocalDate releaseDate;
+    private String overview;
+    private String releaseDate;
     private String director;
-    private Integer durationMinutes;
+    private Integer runtimeMinutes;
     private String genre;
     private String posterPath;
     private String backdropPath;
 
-    public MovieDTO() {
+    public MovieApiResponseDTO() {
     }
 
-    public MovieDTO(Long id, String title, String description, LocalDate releaseDate, String director,
-                    Integer durationMinutes, String genre, String posterPath, String backdropPath) {
-        this.id = id;
+    public MovieApiResponseDTO(String title, String overview, String releaseDate, String director,
+                               Integer runtimeMinutes, String genre, String posterPath, String backdropPath) {
         this.title = title;
-        this.description = description;
+        this.overview = overview;
         this.releaseDate = releaseDate;
         this.director = director;
-        this.durationMinutes = durationMinutes;
+        this.runtimeMinutes = runtimeMinutes;
         this.genre = genre;
         this.posterPath = posterPath;
         this.backdropPath = backdropPath;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -46,19 +34,19 @@ public class MovieDTO {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getOverview() {
+        return overview;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
-    public LocalDate getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(LocalDate releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -70,12 +58,12 @@ public class MovieDTO {
         this.director = director;
     }
 
-    public Integer getDurationMinutes() {
-        return durationMinutes;
+    public Integer getRuntimeMinutes() {
+        return runtimeMinutes;
     }
 
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
+    public void setRuntimeMinutes(Integer runtimeMinutes) {
+        this.runtimeMinutes = runtimeMinutes;
     }
 
     public String getGenre() {

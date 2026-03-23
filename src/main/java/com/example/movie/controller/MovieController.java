@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.movie.dto.CreateMovieDTO;
 import com.example.movie.dto.MovieDTO;
 import com.example.movie.dto.UpdateMovieDTO;
+import com.example.movie.service.MovieImportService;
 import com.example.movie.service.MovieService;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
@@ -20,14 +21,30 @@ import org.springframework.validation.BindingResult;
 public class MovieController {
 
     private final MovieService movieService;
+    private final MovieImportService movieImportService;
 
-    public MovieController(MovieService movieService) {
+    public MovieController(MovieService movieService, MovieImportService movieImportService) {
         this.movieService = movieService;
+        this.movieImportService = movieImportService;
     }
 
     @GetMapping
-    public String listMovies(Model model) {
-        model.addAttribute("movies", movieService.getAllMovies());
+    public String listMovies(
+        @org.springframework.web.bind.annotation.RequestParam(required = false) String title,
+        @org.springframework.web.bind.annotation.RequestParam(required = false) String director,
+        @org.springframework.web.bind.annotation.RequestParam(required = false) String genre,
+        @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+        @org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
+        Model model) {
+        org.springframework.data.domain.Page<com.example.movie.dto.MovieDTO> moviesPage =
+            movieService.getMovies(title, director, genre, page, size);
+        model.addAttribute("moviesPage", moviesPage);
+        model.addAttribute("movies", moviesPage.getContent());
+        model.addAttribute("title", title);
+        model.addAttribute("director", director);
+        model.addAttribute("genre", genre);
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
         return "movies/list";
     }
 
@@ -77,6 +94,12 @@ public class MovieController {
     @PostMapping("/{id}/delete")
     public String deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
+        return "redirect:/movies";
+    }
+
+    @PostMapping("/import")
+    public String importMovies() {
+        movieImportService.importMovies();
         return "redirect:/movies";
     }
 }

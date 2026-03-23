@@ -12,6 +12,24 @@
         <a th:href="@{/movies/create}">Skapa ny film</a>
     </p>
 
+    <form th:action="@{/movies/import}" method="post">
+        <button type="submit">Importera filmer</button>
+    </form>
+
+    <form th:action="@{/movies}" method="get">
+        <label for="title">Titel</label>
+        <input type="text" id="title" name="title" th:value="${title}">
+
+        <label for="director">Regissör</label>
+        <input type="text" id="director" name="director" th:value="${director}">
+
+        <label for="genre">Genre</label>
+        <input type="text" id="genre" name="genre" th:value="${genre}">
+
+        <button type="submit">Filtrera</button>
+        <a th:href="@{/movies}">Rensa filter</a>
+    </form>
+
     <div th:if="${#lists.isEmpty(movies)}">
         <p>Inga filmer ännu.</p>
     </div>
@@ -19,6 +37,7 @@
     <table th:if="${!#lists.isEmpty(movies)}" border="1" cellpadding="6" cellspacing="0">
         <thead>
             <tr>
+                <th>Poster</th>
                 <th>Titel</th>
                 <th>Regissör</th>
                 <th>Genre</th>
@@ -29,6 +48,13 @@
         </thead>
         <tbody>
             <tr th:each="movie : ${movies}">
+                <td>
+                    <span th:if="${movie.posterPath == null}">No image</span>
+                    <img th:if="${movie.posterPath != null}"
+                         th:src="${'https://image.tmdb.org/t/p/w200' + movie.posterPath}"
+                         alt="Poster"
+                         style="max-width:100px;">
+                </td>
                 <td th:text="${movie.title}">Titel</td>
                 <td th:text="${movie.director}">Regissör</td>
                 <td th:text="${movie.genre}">Genre</td>
@@ -43,5 +69,21 @@
             </tr>
         </tbody>
     </table>
+
+    <div th:if="${moviesPage != null and moviesPage.totalPages > 1}">
+        <span th:text="${moviesPage.number + 1}">1</span>
+        /
+        <span th:text="${moviesPage.totalPages}">1</span>
+
+        <a th:if="${moviesPage.hasPrevious()}"
+           th:href="@{/movies(page=${moviesPage.number - 1},size=${moviesPage.size},title=${title},director=${director},genre=${genre})}">
+            Föregående
+        </a>
+
+        <a th:if="${moviesPage.hasNext()}"
+           th:href="@{/movies(page=${moviesPage.number + 1},size=${moviesPage.size},title=${title},director=${director},genre=${genre})}">
+            Nästa
+        </a>
+    </div>
 </body>
 </html>
